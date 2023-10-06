@@ -3,9 +3,13 @@ import Link from 'next/link';
 import { options } from './api/auth/[...nextauth]/options';
 import SignOut from '@/ui/SignOut/SignOut';
 import SignIn from '@/ui/SignIn/SignIn';
+import { useSession } from 'next-auth/react';
+import TestComponent from '@/ui/TestComponent/TestComponent';
 
 export default async function HomePage() {
   const session = await getServerSession(options);
+
+  console.log(session);
 
   return (
     <>
@@ -22,6 +26,7 @@ export default async function HomePage() {
       ) : (
         <div>Вы не зарегестрированы</div>
       )}
+      <TestComponent />
     </>
   );
 }

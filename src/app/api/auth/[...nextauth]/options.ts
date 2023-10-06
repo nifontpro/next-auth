@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
 import axios, { AxiosError } from 'axios';
+import { refreshAccessToken } from '../refreshAccessToken';
 
 declare module 'next-auth/jwt' {
   interface JWT {
@@ -27,14 +28,37 @@ export const options: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.id_token = account.id_token;
-        token.provider = account.provider;
+    // async jwt({ token, account }) {
+    //   if (account) {
+    //     token.id_token = account.id_token;
+    //     token.provider = account.provider;
+    //   }
+    //   return token;
+    // },
+    jwt({ token, user, account }) {
+      // Initial sign in
+      if (account && user) {
+        // Add access_token, refresh_token and expirations to the token right after signin
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpired = account.expires_at! * 1000;
+        token.refreshTokenExpired =
+          Date.now() + (account.refresh_expires_in as number) * 1000;
+        token.user = user;
+
+        return token;
       }
-      return token;
+
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < (token.accessTokenExpired as number)) {
+        return token;
+      }
+
+      // Access token has expired, try to update it
+      return refreshAccessToken(token);
     },
   },
+
   events: {
     signOut: async ({ session, token }) => {
       const { provider, id_token } = token;

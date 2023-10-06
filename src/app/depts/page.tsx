@@ -1,6 +1,5 @@
 import { getServerSession } from 'next-auth';
 import { options } from '../api/auth/[...nextauth]/options';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function DeptsPage() {

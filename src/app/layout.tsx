@@ -1,7 +1,7 @@
 import './globals.scss';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Providers from '../providers';
+import AuthProviders from '../AuthProviders';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,9 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
-      <Providers>
-        <body>{children}</body>
-      </Providers>
+      <body>
+        <AuthProviders>
+          <main>{children}</main>
+        </AuthProviders>
+      </body>
     </html>
   );
 }
